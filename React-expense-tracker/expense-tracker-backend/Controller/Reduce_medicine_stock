@@ -1,0 +1,35 @@
+const Medicine = require('../Models/Add_items'); // Assuming Medicine is the model
+
+const reduceMedicineStock = async (req, res) => {
+    let { MedicineName, reduceStockNumber } = req.body;
+  
+    // Convert reduceStockNumber to an integer
+    let ReduceMedicineStock = parseInt(reduceStockNumber);
+  
+    try {
+      // Find the medicine by MedicineName
+      const foundMedicine = await Medicine.findOne({ MedicineName });
+  
+      if (foundMedicine) {
+        // If the medicine is found, update the MedicineTotalStock
+        foundMedicine.MedicineTotalStock -= ReduceMedicineStock;
+  
+        // Save the updated medicine to the database
+        await foundMedicine.save();
+  
+        // Respond with the updated medicine
+        res.status(200).json({ message: true });
+      } else {
+        // If the medicine is not found, respond with an error message
+        res.status(404).json({ error: 'Medicine not found' });
+      }
+    } catch (error) {
+      console.error('Error reducing medicine stock:', error);
+      // Handle the error and respond with an error status code
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+module.exports = {
+    reduceMedicineStock
+};
